@@ -2,6 +2,8 @@
 
 class Truonglv_YetiShareBridge_Option
 {
+    const OPTION_PREFIX = 'YetiShareBridge_';
+
     /**
      * @param string $key
      * @param string|null $subKey
@@ -9,7 +11,7 @@ class Truonglv_YetiShareBridge_Option
      */
     public static function get($key, $subKey = null)
     {
-        return XenForo_Application::getOptions()->get('YetiShareBridge_' . $key, $subKey);
+        return XenForo_Application::getOptions()->get(self::OPTION_PREFIX . $key, $subKey);
     }
 
     /** @noinspection PhpUnused */

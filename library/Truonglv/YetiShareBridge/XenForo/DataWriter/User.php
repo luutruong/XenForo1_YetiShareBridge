@@ -2,21 +2,43 @@
 
 class Truonglv_YetiShareBridge_XenForo_DataWriter_User extends XFCP_Truonglv_YetiShareBridge_XenForo_DataWriter_User
 {
+    protected $_YetiShare_userPassword = null;
+
+    public function setPassword(
+        $password,
+        $passwordConfirm = false,
+        XenForo_Authentication_Abstract $auth = null,
+        $requirePassword = false
+    ) {
+        $success = parent::setPassword($password, $passwordConfirm, $auth, $requirePassword);
+        if ($success) {
+            $this->_YetiShare_userPassword = $password;
+        }
+
+        return $success;
+    }
+
     protected function _postSave()
     {
         parent::_postSave();
 
+        $userData = $this->getMergedData();
+        if ($this->isInsert() && $this->_YetiShare_userPassword !== null) {
+            // create a new user
+            Truonglv_YetiShareBridge_Helper_YetiShare::createUser($userData, $this->_YetiShare_userPassword);
+        }
+
         $shouldUpgrade = false;
         $shouldDowngrade = false;
 
-        if ($this->isChanged('user_group_id')) {
+        if ($this->isUpdate() && $this->isChanged('user_group_id')) {
             $existingUserGroupId = $this->getExisting('user_group_id');
             $newUserGroupId = $this->get('user_group_id');
 
             $this->_tYetiShareBridge_onDataChanges($existingUserGroupId, $newUserGroupId, $shouldUpgrade, $shouldDowngrade);
         }
 
-        if ($this->isChanged('secondary_group_ids')) {
+        if ($this->isUpdate() && $this->isChanged('secondary_group_ids')) {
             $existingUserGroupIds = $this->_tYetiShareBridge_convertArray($this->getExisting('secondary_group_ids'));
             $newUserGroupIds = $this->_tYetiShareBridge_convertArray($this->get('secondary_group_ids'));
 
@@ -24,9 +46,9 @@ class Truonglv_YetiShareBridge_XenForo_DataWriter_User extends XFCP_Truonglv_Yet
         }
 
         if ($shouldUpgrade) {
-            Truonglv_YetiShareBridge_Helper_YetiShare::upgradeUser($this->getMergedData());
+            Truonglv_YetiShareBridge_Helper_YetiShare::upgradeUser($userData);
         } elseif ($shouldDowngrade) {
-            Truonglv_YetiShareBridge_Helper_YetiShare::downgradeUser($this->getMergedData());
+            Truonglv_YetiShareBridge_Helper_YetiShare::downgradeUser($userData);
         }
     }
 
