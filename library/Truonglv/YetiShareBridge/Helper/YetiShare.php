@@ -15,38 +15,91 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
      */
     protected static $_packages = null;
 
-    public static function upgradeUser(array $user)
+    public static function upgradeUser(array $user, $expirationDate)
     {
         $vipPackageId = (int) Truonglv_YetiShareBridge_Option::get('vipPackageId');
         if ($vipPackageId <= 0) {
             return false;
         }
+        $externalAuth = self::_getUserExternalModel()->getExternalAuthAssociationForUser(
+            self::PROVIDER_EXTERNAL_USER,
+            $user['user_id']
+        );
+        if (empty($externalAuth)) {
+            return false;
+        }
 
         self::_ensureAccessTokenLoaded();
 
-        $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, [
-            'account_id' => 0,
+        $updateChanges = [
+            'account_id' => $externalAuth['provider_key'],
             'package_id' => $vipPackageId,
-            'paid_expiry_date' => 0
-        ]);
+        ];
+        if ($expirationDate > 0) {
+            $updateChanges['paid_expiry_date'] = date('Y-m-d H:i:s', $expirationDate);
+        }
+        $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, $updateChanges);
 
-        return isset($response['data']) && isset($response['data']['id']);
+        if (isset($response['data']) && isset($response['data']['id'])) {
+            return true;
+        } else {
+            self::log('Failed to upgrade user. $userId=' . $user['user_id']
+                . ' $YetiShareId=' . $externalAuth['provider_key']
+                . ' $error=' . $response['response']);
+        }
+
+        return false;
     }
 
     public static function downgradeUser(array $user)
     {
+        $freePackage = Truonglv_YetiShareBridge_Option::get('defaultPackage');
+        $externalAuth = self::_getUserExternalModel()->getExternalAuthAssociationForUser(
+            self::PROVIDER_EXTERNAL_USER,
+            $user['user_id']
+        );
+        if (empty($externalAuth)) {
+            return false;
+        }
+
         self::_ensureAccessTokenLoaded();
+        $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, [
+            'account_id' => $externalAuth['provider_key'],
+            'package_id' => $freePackage
+        ]);
+
+        if (isset($response['data']) && isset($response['data']['id'])) {
+            return true;
+        } else {
+            self::log('Failed to downgrade user. $userId=' . $user['user_id']
+                . ' $YetiShareId=' . $externalAuth['provider_key']
+                . ' $error=' . $response['response']);
+        }
+
+        return false;
     }
 
     public static function createUser(array $user, $password)
     {
+        $defaultPackage = Truonglv_YetiShareBridge_Option::get('defaultPackage');
+        if ($defaultPackage <= 0) {
+            return false;
+        }
+
+        if (Truonglv_YetiShareBridge_Option::isUserVIP($user)) {
+            $vipPackage = (int) Truonglv_YetiShareBridge_Option::get('vipPackageId');
+            if ($vipPackage > 0) {
+                $defaultPackage = $vipPackage;
+            }
+        }
+
         self::_ensureAccessTokenLoaded();
 
         $payload = array(
             'username' => $user['username'],
             'password' => $password,
             'email' => $user['email'],
-            'package_id' => 0,
+            'package_id' => $defaultPackage,
             'status' => $user['user_state'] === 'valid' ? 'active' : 'pending',
             'title' => $user['gender'] === 'male' ? 'Mr' : 'Ms',
             'firstname' => $user['username'],
@@ -62,9 +115,15 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
                 $user['user_id'],
                 $response['data']
             );
+
+            return true;
         } else {
-            self::log('Failed to create YetiShare user for user. $id=' . $user['user_id']);
+            self::log('Failed to create YetiShare user for user. $id='
+                . $user['user_id']
+                . ' $error=' . $response['response']);
         }
+
+        return false;
     }
 
     public static function getPackageListing()
@@ -140,10 +199,19 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
     protected static function _ensureAccessTokenLoaded()
     {
         $accessToken = Truonglv_YetiShareBridge_Option::get('accessToken');
-        if (empty($accessToken)) {
+        $apiKey1 = Truonglv_YetiShareBridge_Option::get('apiKey1');
+        $apiKey2 = Truonglv_YetiShareBridge_Option::get('apiKey2');
+
+        if (empty($accessToken) || empty($accessToken['hash'])) {
+            $shouldReload = true;
+        } else {
+            $shouldReload = md5($apiKey1 . $apiKey2) !== $accessToken['hash'];
+        }
+
+        if ($shouldReload) {
             $token = self::_request('POST', self::ENDPOINT_AUTHORIZE, [
-                'key1' => Truonglv_YetiShareBridge_Option::get('apiKey1'),
-                'key2' => Truonglv_YetiShareBridge_Option::get('apiKey2')
+                'key1' => $apiKey1,
+                'key2' => $apiKey2
             ]);
 
             if (!$token || (isset($token['status']) && $token['status'] === 'error')) {
@@ -151,7 +219,11 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
                     . $token['response']);
             }
 
-            self::_updateOption($token);
+            $tokenArray = $token['data'];
+            $tokenArray['_datetime'] = $token['_datetime'];
+            $tokenArray['hash'] = md5($apiKey1 . $apiKey2);
+
+            self::_updateOption($tokenArray);
         }
     }
 
@@ -206,7 +278,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
 
         if ($endPoint !== self::ENDPOINT_AUTHORIZE && !isset($payload['access_token'])) {
             $accessToken = Truonglv_YetiShareBridge_Option::get('accessToken');
-            $payload['access_token'] = $accessToken['data']['access_token'];
+            $payload['access_token'] = $accessToken['access_token'];
         }
 
         $client = XenForo_Helper_Http::getClient($url);

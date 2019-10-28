@@ -14,6 +14,28 @@ class Truonglv_YetiShareBridge_Option
         return XenForo_Application::getOptions()->get(self::OPTION_PREFIX . $key, $subKey);
     }
 
+    /**
+     * @param array $user
+     * @return bool
+     */
+    public static function isUserVIP(array $user)
+    {
+        $vipGroupId = (int) self::get('vipGroupId');
+        if ($vipGroupId <= 0) {
+            return false;
+        }
+
+        $userGroupIds = array($user['user_group_id']);
+        if (!empty($user['secondary_group_ids'])) {
+            $ids = explode(',', $user['secondary_group_ids']);
+            $userGroupIds = array_merge($userGroupIds, $ids);
+            $userGroupIds = array_unique($userGroupIds);
+        }
+
+        $userGroupIds = array_map('intval', $userGroupIds);
+        return in_array($vipGroupId, $userGroupIds, true);
+    }
+
     /** @noinspection PhpUnused */
     /**
      * @param XenForo_View $view
@@ -39,6 +61,8 @@ class Truonglv_YetiShareBridge_Option
             )
         );
         if (isset($packages['data'], $packages['data']['packages'])) {
+            unset($formatParams[0]);
+
             foreach ($packages['data']['packages'] as $package) {
                 $formatParams[] = array(
                     'value' => $package['id'],
