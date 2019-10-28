@@ -31,7 +31,7 @@ class Truonglv_YetiShareBridge_DevHelper_Config extends DevHelper_Config_Base
                 'route_prefix_admin' => false,
                 'controller_admin' => false,
             ),
-        ),
+        )
     );
     protected $_dataPatches = array();
     protected $_exportPath = false;

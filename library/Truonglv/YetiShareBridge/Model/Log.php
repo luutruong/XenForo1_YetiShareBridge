@@ -75,8 +75,7 @@ class Truonglv_YetiShareBridge_Model_Log extends XenForo_Model
                 $joinOptions[joinTables]
             WHERE $whereConditions
                 $orderClause
-            ", $limitOptions['limit'], $limitOptions['offset']
-        ), 'log_id');
+            ", $limitOptions['limit'], $limitOptions['offset']), 'log_id');
 
         $this->_getAllLogCustomized($allLog, $fetchOptions);
 
@@ -218,5 +217,4 @@ class Truonglv_YetiShareBridge_Model_Log extends XenForo_Model
     {
         // customized code goes here
     }
-
 }

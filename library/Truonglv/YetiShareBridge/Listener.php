@@ -13,4 +13,18 @@ class Truonglv_YetiShareBridge_Listener
             $extend[] = 'Truonglv_YetiShareBridge_XenForo_DataWriter_User';
         }
     }
+
+    public static function load_class_XenForo_ControllerPublic_Login($class, array &$extend)
+    {
+        if ($class === 'XenForo_ControllerPublic_Login') {
+            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Login';
+        }
+    }
+
+    public static function load_class_XenForo_ControllerPublic_Account($class, array &$extend)
+    {
+        if ($class === 'XenForo_ControllerPublic_Account') {
+            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Account';
+        }
+    }
 }

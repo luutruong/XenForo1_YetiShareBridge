@@ -5,7 +5,10 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
     const ENDPOINT_AUTHORIZE = 'authorize';
     const ENDPOINT_ACCOUNT_CREATE = 'account/create';
     const ENDPOINT_ACCOUNT_EDIT = 'account/edit';
+    const ENDPOINT_ACCOUNT_INFO = 'account/info';
     const ENDPOINT_PACKAGE_LISTING = 'package/listing';
+
+    const PROVIDER_EXTERNAL_USER = 'YetiShare';
 
     /**
      * @var array
@@ -52,7 +55,13 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
 
         $response = self::_request('POST', self::ENDPOINT_ACCOUNT_CREATE, $payload);
         if (isset($response['data'], $response['data']['id'])) {
-            // good. it's created
+            $userExternalModel = self::_getUserExternalModel();
+            $userExternalModel->updateExternalAuthAssociation(
+                self::PROVIDER_EXTERNAL_USER,
+                $response['data']['id'],
+                $user['user_id'],
+                $response['data']
+            );
         } else {
             self::log('Failed to create YetiShare user for user. $id=' . $user['user_id']);
         }
@@ -70,6 +79,16 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         return self::$_packages;
     }
 
+    public static function fetchAccountInfo($accountId, $accessToken)
+    {
+        $response = self::_request('GET', self::ENDPOINT_ACCOUNT_INFO, array(
+            'access_token' => $accessToken,
+            'account_id' => $accountId
+        ));
+
+        return self::_expectResponseData($response, 'id');
+    }
+
     /**
      * @param string $apiKey1
      * @param string $apiKey2
@@ -78,10 +97,44 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
      */
     public static function fetchAccessToken($apiKey1, $apiKey2)
     {
-        return self::_request('POST', self::ENDPOINT_AUTHORIZE, [
+        $response = self::_request('POST', self::ENDPOINT_AUTHORIZE, [
             'key1' => $apiKey1,
             'key2' => $apiKey2
         ]);
+
+        return self::_expectResponseData($response, array('access_token'));
+    }
+
+    public static function getSSOLoginUrl($userId, $redirect, $ipAddress)
+    {
+        /** @var XenForo_Model_UserExternal $userExternalModel */
+        $userExternalModel = XenForo_Model::create('XenForo_Model_UserExternal');
+        $authAssoc = $userExternalModel->getExternalAuthAssociationForUser(self::PROVIDER_EXTERNAL_USER, $userId);
+
+        if (empty($authAssoc)) {
+            return null;
+        }
+
+        $baseUrl = Truonglv_YetiShareBridge_Option::get('baseUrl');
+        if (empty($baseUrl)) {
+            return null;
+        }
+
+        $baseUrl = rtrim($baseUrl, '/') . '/xfbridge.php';
+        $payload = array(
+            'redirect' => $redirect,
+            'timestamp' => time(),
+            'action' => 'login',
+            'userId' => $authAssoc['provider_key'],
+            'ip' => $ipAddress
+        );
+
+        $encryptKey = Truonglv_YetiShareBridge_Option::get('encryptKey');
+        $encrypted = Truonglv_YetiShareBridge_Helper_Encrypt::encrypt($payload, $encryptKey);
+
+        return $baseUrl . '?' . XenForo_Link::buildQueryString(array(
+            'd' => $encrypted
+        ));
     }
 
     protected static function _ensureAccessTokenLoaded()
@@ -105,6 +158,38 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
     protected static function _revokeToken()
     {
         self::_updateOption(array());
+    }
+
+    protected static function _expectResponseData($response, $expectedKeys)
+    {
+        if (!is_array($response) || !isset($response['data'])) {
+            return null;
+        }
+        if (!is_array($expectedKeys)) {
+            $expectedKeys = array($expectedKeys);
+        }
+
+        $data = $response['data'];
+        foreach ($expectedKeys as $expectedKey) {
+            if (is_array($data) && array_key_exists($expectedKey, $data)) {
+                $data = $data[$expectedKey];
+            } else {
+                return null;
+            }
+        }
+
+        return $response['data'];
+    }
+
+    /**
+     * @return XenForo_Model_UserExternal
+     */
+    protected static function _getUserExternalModel()
+    {
+        /** @var XenForo_Model_UserExternal $model */
+        $model = XenForo_Model::create('XenForo_Model_UserExternal');
+
+        return $model;
     }
 
     /**

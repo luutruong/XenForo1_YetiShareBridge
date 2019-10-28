@@ -82,5 +82,4 @@ class Truonglv_YetiShareBridge_Installer
     {
         // customized uninstall script goes here
     }
-
 }
