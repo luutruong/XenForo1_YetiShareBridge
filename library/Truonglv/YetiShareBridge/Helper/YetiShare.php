@@ -15,12 +15,8 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
      */
     protected static $_packages = null;
 
-    public static function upgradeUser(array $user, $expirationDate)
+    public static function updateUser(array $user, array $changes)
     {
-        $vipPackageId = (int) Truonglv_YetiShareBridge_Option::get('vipPackageId');
-        if ($vipPackageId <= 0) {
-            return false;
-        }
         $externalAuth = self::_getUserExternalModel()->getExternalAuthAssociationForUser(
             self::PROVIDER_EXTERNAL_USER,
             $user['user_id']
@@ -29,54 +25,60 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
             return false;
         }
 
+        $updates = array(
+            'account_id' => $externalAuth['provider_key']
+        );
+        if (!empty($changes['is_downgrade'])) {
+            $freePackage = Truonglv_YetiShareBridge_Option::get('defaultPackage');
+            $updates['package_id'] = $freePackage;
+        } elseif (!empty($changes['is_upgrade'])) {
+            $vipPackageId = (int) Truonglv_YetiShareBridge_Option::get('vipPackageId');
+            if ($vipPackageId > 0) {
+                $updates['package_id'] = $vipPackageId;
+
+                if (!empty($changes['upgrade_expiration_date'])) {
+                    $updates['paid_expiry_date'] = date('Y-m-d H:i:s', $changes['upgrade_expiration_date']);
+                }
+            }
+        }
+        if (isset($changes['user_state'])) {
+            $updates['status'] = ($changes['user_state'] === 'valid') ? 'active' : 'pending';
+        }
+
+        $legacyKeys = array('email', 'password');
+        foreach ($legacyKeys as $legacyKey) {
+            if (isset($changes[$legacyKey])) {
+                $updates[$legacyKey] = $changes[$legacyKey];
+            }
+        }
+
         self::_ensureAccessTokenLoaded();
+        $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, $updates);
 
-        $updateChanges = [
-            'account_id' => $externalAuth['provider_key'],
-            'package_id' => $vipPackageId,
-        ];
-        if ($expirationDate > 0) {
-            $updateChanges['paid_expiry_date'] = date('Y-m-d H:i:s', $expirationDate);
+        if (self::_isAccessTokenInvalid($response)) {
+            return $response['data'];
         }
-        $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, $updateChanges);
 
-        if (isset($response['data']) && isset($response['data']['id'])) {
-            return true;
-        } else {
-            self::log('Failed to upgrade user. $userId=' . $user['user_id']
-                . ' $YetiShareId=' . $externalAuth['provider_key']
-                . ' $error=' . $response['response']);
-        }
+        self::log('Failed to update YetiShare user.'
+            . ' $userId=' . $user['user_id']
+            . ' $YetiShareAccountId=' . $updates['account_id']
+            . ' $error=' . $response['response']
+        );
 
         return false;
     }
 
+    public static function upgradeUser(array $user, $expirationDate)
+    {
+        return self::updateUser($user, array(
+            'is_upgrade' => true,
+            'upgrade_expiration_date' => $expirationDate
+        ));
+    }
+
     public static function downgradeUser(array $user)
     {
-        $freePackage = Truonglv_YetiShareBridge_Option::get('defaultPackage');
-        $externalAuth = self::_getUserExternalModel()->getExternalAuthAssociationForUser(
-            self::PROVIDER_EXTERNAL_USER,
-            $user['user_id']
-        );
-        if (empty($externalAuth)) {
-            return false;
-        }
-
-        self::_ensureAccessTokenLoaded();
-        $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, [
-            'account_id' => $externalAuth['provider_key'],
-            'package_id' => $freePackage
-        ]);
-
-        if (isset($response['data']) && isset($response['data']['id'])) {
-            return true;
-        } else {
-            self::log('Failed to downgrade user. $userId=' . $user['user_id']
-                . ' $YetiShareId=' . $externalAuth['provider_key']
-                . ' $error=' . $response['response']);
-        }
-
-        return false;
+        return self::updateUser($user, array('is_downgrade' => true));
     }
 
     public static function createUser(array $user, $password)
