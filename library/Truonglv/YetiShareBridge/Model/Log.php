@@ -2,6 +2,8 @@
 
 class Truonglv_YetiShareBridge_Model_Log extends XenForo_Model
 {
+    const FETCH_USER = 2;
+
     public function log(
         $method,
         $endPoint,
@@ -25,6 +27,26 @@ class Truonglv_YetiShareBridge_Model_Log extends XenForo_Model
         ));
 
         return $db->lastInsertId('xf_truonglv_yetisharebridge_log');
+    }
+
+    public function prepareLog(array $log)
+    {
+        $requestData = json_decode($log['request_data'], true);
+        if (isset($requestData['password'])) {
+            $requestData['password'] = '******';
+        }
+        if (isset($requestData['access_token'])) {
+            $requestData['access_token'] = '******';
+        }
+        $log['requestData'] = $requestData;
+
+        $responseData = json_decode($log['response_data'], true);
+        if (isset($responseData['data'], $responseData['data']['access_token'])) {
+            $responseData['data']['access_token'] = '******';
+        }
+        $log['responseData'] = $responseData;
+
+        return $log;
     }
 
     /* Start auto-generated lines of code. Change made will be overwriten... */
@@ -210,11 +232,18 @@ class Truonglv_YetiShareBridge_Model_Log extends XenForo_Model
 
     protected function _prepareLogFetchOptionsCustomized(&$selectFields, &$joinTables, array $fetchOptions)
     {
-        // customized code goes here
+        if (!empty($fetchOptions['join'])) {
+            if ($fetchOptions['join'] & self::FETCH_USER) {
+                $selectFields .= ',user.*';
+                $joinTables .= 'LEFT JOIN xf_user AS user ON (user.user_id = log.user_id)';
+            }
+        }
     }
 
     protected function _prepareLogOrderOptionsCustomized(array &$choices, array &$fetchOptions)
     {
-        // customized code goes here
+        $choices += array(
+            'log_date' => 'log.log_date'
+        );
     }
 }

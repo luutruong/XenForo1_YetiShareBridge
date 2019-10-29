@@ -41,4 +41,18 @@ class Truonglv_YetiShareBridge_Listener
             $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Logout';
         }
     }
+
+    public static function load_class_XenForo_ControllerAdmin_Tools($class, array &$extend)
+    {
+        if ($class === 'XenForo_ControllerAdmin_Tools') {
+            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerAdmin_Tools';
+        }
+    }
+
+    public static function load_class_XenForo_ControllerAdmin_Log($class, array &$extend)
+    {
+        if ($class === 'XenForo_ControllerAdmin_Log') {
+            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerAdmin_Log';
+        }
+    }
 }

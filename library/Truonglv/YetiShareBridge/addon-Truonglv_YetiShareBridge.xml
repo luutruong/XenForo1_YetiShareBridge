@@ -1,9 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="Truonglv_YetiShareBridge" title="[tl] YetiShare Bridge" version_string="1.0.0" version_id="1000100" url="" install_callback_class="Truonglv_YetiShareBridge_Installer" install_callback_method="install" uninstall_callback_class="Truonglv_YetiShareBridge_Installer" uninstall_callback_method="uninstall">
-  <admin_navigation/>
+<addon addon_id="Truonglv_YetiShareBridge" title="[tl] YetiShare Bridge" version_string="1.0.1" version_id="1000100" url="" install_callback_class="Truonglv_YetiShareBridge_Installer" install_callback_method="install" uninstall_callback_class="Truonglv_YetiShareBridge_Installer" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="YetiShareBridge_Logs" parent_navigation_id="logs" display_order="190000" link="logs/yetishare-bridge-logs" admin_permission_id="viewLogs" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
   <admin_permissions/>
   <admin_style_properties/>
   <admin_templates>
+    <template title="yetishare_bridge_log_list"><![CDATA[<xen:title>{xen:phrase yetishare_bridge_api_logs}</xen:title>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+
+<xen:if is="{$entries}">
+
+	<div class="section">
+	
+		<h2 class="subHeading">
+			{xen:phrase yetishare_bridge_api_logs}
+		</h2>
+	
+		<ol class="FilterList secondRow">
+			<xen:foreach loop="$entries" value="$entry">
+				<xen:listitem id="{$entry.error_id}"
+					href="{xen:adminlink logs/yetishare-bridge-logs, '', 'id={$entry.log_id}'}"
+					linkclass="OverlayTrigger">
+					<xen:label>{$entry.method} - {$entry.end_point} ({$entry.response_code})
+						<span class="secondRow">
+							{$entry.username}
+							-
+							<xen:datetime time="{$entry.log_date}" class="faint" />
+						</span>
+					</xen:label>
+				</xen:listitem>
+			</xen:foreach>
+		</ol>
+	
+		<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $entries}</span>', 'total={xen:number $total}'}</p>
+	
+	</div>
+		
+	<xen:adminpagenav page="{$page}" perpage="{$perPage}" total="{$total}" 
+					  link="logs/yetishare-bridge-logs" />
+
+<xen:else />
+	<div class="noResults">{xen:phrase no_errors_have_been_logged}</div>
+</xen:if>]]></template>
+    <template title="yetishare_bridge_log_view"><![CDATA[<xen:title>{xen:phrase yetishare_bridge_log_entry}</xen:title>
+
+<div class="section">
+	<div class="overlayScroll horizontalContain">
+		<table width="100%">
+		<tr>
+			<th class="subHeading">{xen:phrase yetishare_bridge_log_info}</th>
+		</tr>
+		<tr>
+			<td class="primaryContent">
+				<span class="dimmed">{$entry.method}:</span> {$entry.end_point} - <span class="dimmed">{$entry.response_code}</span>
+				<div class="muted">{xen:phrase generated_by}: {xen:if $entry.username, '<a href="{xen:adminlink users/edit, $entry}">{$entry.username}</a>', {xen:phrase unknown_account}}, <xen:datetime time="{$entry.log_date}" /></div>
+			</td>
+		</tr>
+		<tr>
+			<th class="subHeading">{xen:phrase yetishare_bridge_request_data}</th>
+		</tr>
+		<tr>
+			<td class="primaryContent">{xen:helper dump, $entry.requestData}</td>
+		</tr>
+		<tr>
+			<th class="subHeading">{xen:phrase yetishare_bridge_response_data}</th>
+		</tr>
+		<tr>
+			<td class="primaryContent">{xen:helper dump, $entry.responseData}</td>
+		</tr>
+		</table>
+	</div>
+	<div class="sectionFooter overlayOnly">
+		<a class="button primary OverlayCloser">{xen:phrase close}</a>
+	</div>
+</div>]]></template>
     <template title="yetishare_bridge_option_template_vipMapping"><![CDATA[<xen:require js="js/Truonglv/YetiShareBridge/options.min.js" />
 
 <style>
@@ -61,10 +134,13 @@
     <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Login" active="1" hint="XenForo_ControllerPublic_Login" description="XenForo_ControllerPublic_Login"/>
     <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Account" active="1" hint="XenForo_ControllerPublic_Account" description="XenForo_ControllerPublic_Account"/>
     <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Logout" active="1" hint="XenForo_ControllerPublic_Logout" description="XenForo_ControllerPublic_Logout"/>
+    <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerAdmin_Log" active="1" hint="XenForo_ControllerAdmin_Log" description="XenForo_ControllerAdmin_Log"/>
     <listener event_id="load_class_datawriter" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_DataWriter_User" active="1" hint="XenForo_DataWriter_User" description="XenForo_DataWriter_User"/>
-    <listener event_id="load_class_model" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_Model_UserUpgrade" active="1" hint="XenForo_Model_UserUpgrade" description="XenForo_Model_UserUpgrade"/>
+    <listener event_id="load_class_model" execute_order="1" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_Model_UserUpgrade" active="1" hint="" description="XenForo_Model_UserUpgrade"/>
   </code_event_listeners>
-  <cron/>
+  <cron>
+    <entry entry_id="YetiShareBridge_cleanUp" cron_class="Truonglv_YetiShareBridge_CronEntry_Auto" cron_method="runHourly" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["-1"],"minutes":["0"]}]]></entry>
+  </cron>
   <email_templates/>
   <email_template_modifications/>
   <optiongroups>
@@ -124,6 +200,8 @@
     <interface_groups/>
   </permissions>
   <phrases>
+    <phrase title="admin_navigation_YetiShareBridge_Logs" version_id="1000100" version_string="1.0.1"><![CDATA[[tl] YetiShare Bridge: Api Logs]]></phrase>
+    <phrase title="cron_entry_YetiShareBridge_cleanUp" version_id="1000100" version_string="1.0.1"><![CDATA[[tl] YetiShare Bridge: Clean up (hourly)]]></phrase>
     <phrase title="option_group_Truonglv_YetiShareBridge" version_id="1000000" version_string="1.0.0"><![CDATA[[tl] YetiShare Bridge]]></phrase>
     <phrase title="option_group_Truonglv_YetiShareBridge_description" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
     <phrase title="option_YetiShareBridge_accessToken" version_id="1000000" version_string="1.0.0"><![CDATA[Access token]]></phrase>
@@ -143,12 +221,17 @@
     <phrase title="option_YetiShareBridge_vipMapping" version_id="1000000" version_string="1.0.0"><![CDATA[VIP Mapping]]></phrase>
     <phrase title="option_YetiShareBridge_vipMapping_explain" version_id="1000000" version_string="1.0.0"><![CDATA[Map from XenForo User Group to YetiShare package.]]></phrase>
     <phrase title="yetishare_bridge_account" version_id="1000000" version_string="1.0.0"><![CDATA[Account]]></phrase>
+    <phrase title="yetishare_bridge_api_logs" version_id="1000100" version_string="1.0.1"><![CDATA[Api Logs]]></phrase>
     <phrase title="yetishare_bridge_associate" version_id="1000000" version_string="1.0.0"><![CDATA[Associate with YetiShare]]></phrase>
     <phrase title="yetishare_bridge_error_account_disabled" version_id="1000000" version_string="1.0.0"><![CDATA[Your YetiShare account has been disabled. Please connect with other or contact with administrator to resolve it.]]></phrase>
     <phrase title="yetishare_bridge_error_account_integrated_with_other" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare account has been integrated with other account.]]></phrase>
     <phrase title="yetishare_bridge_error_invalid_api_key" version_id="1000000" version_string="1.0.0"><![CDATA[Please enter a valid api key.]]></phrase>
     <phrase title="yetishare_bridge_integration" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare Integration]]></phrase>
+    <phrase title="yetishare_bridge_log_entry" version_id="1000100" version_string="1.0.1"><![CDATA[Log Entry]]></phrase>
+    <phrase title="yetishare_bridge_log_info" version_id="1000100" version_string="1.0.1"><![CDATA[Log Info]]></phrase>
     <phrase title="yetishare_bridge_password" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare password]]></phrase>
+    <phrase title="yetishare_bridge_request_data" version_id="1000100" version_string="1.0.1"><![CDATA[Request Data]]></phrase>
+    <phrase title="yetishare_bridge_response_data" version_id="1000100" version_string="1.0.1"><![CDATA[Response Data]]></phrase>
     <phrase title="yetishare_bridge_username" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare username]]></phrase>
     <phrase title="yetishare_bridge_your_account_is_not_currently_associated_with_yetishare_account" version_id="1000000" version_string="1.0.0"><![CDATA[Your account is not currently associated with YetiShare account.<br/>
 To associate with your YetiShare account you may provide api key1 and api key2 from your account setting in YetiShare.]]></phrase>

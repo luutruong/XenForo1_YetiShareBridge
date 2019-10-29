@@ -83,7 +83,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
     public static function createUser(array $user, $password)
     {
         $defaultPackage = Truonglv_YetiShareBridge_Option::get('defaultPackage');
-        if ($defaultPackage <= 0) {
+        if ($defaultPackage < 0) {
             return false;
         }
 
