@@ -4,8 +4,9 @@ class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Login extends XFCP_Truon
 {
     public function completeLogin($userId, $remember, $redirect, array $postData = array())
     {
-        $ssoLoginUrl = Truonglv_YetiShareBridge_Helper_YetiShare::getSSOLoginUrl(
+        $ssoLoginUrl = Truonglv_YetiShareBridge_Helper_YetiShare::getSSOUrl(
             $userId,
+            'login',
             $redirect,
             $this->_request->getClientIp()
         );

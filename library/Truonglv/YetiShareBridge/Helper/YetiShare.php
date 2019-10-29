@@ -166,8 +166,13 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         return self::_expectResponseData($response, array('access_token'));
     }
 
-    public static function getSSOLoginUrl($userId, $redirect, $ipAddress)
+    public static function getSSOUrl($userId, $action, $redirect, $ipAddress)
     {
+        if (empty($redirect)) {
+            $redirect = XenForo_Link::buildPublicLink('index');
+        }
+        $redirect = XenForo_Link::convertUriToAbsoluteUri($redirect, true);
+
         /** @var XenForo_Model_UserExternal $userExternalModel */
         $userExternalModel = XenForo_Model::create('XenForo_Model_UserExternal');
         $authAssoc = $userExternalModel->getExternalAuthAssociationForUser(self::PROVIDER_EXTERNAL_USER, $userId);
@@ -185,7 +190,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         $payload = array(
             'redirect' => $redirect,
             'timestamp' => time(),
-            'action' => 'login',
+            'action' => $action,
             'userId' => $authAssoc['provider_key'],
             'ip' => $ipAddress
         );
