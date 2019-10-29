@@ -1,2 +1,4 @@
-library/Truonglv/DevHelper/*
 *.devhelper
+library/Truonglv/DevHelper/*
+library/Truonglv/YetiShareBridge/DevHelper/Generated
+library/Truonglv/YetiShareBridge/DevHelper/XFCP
