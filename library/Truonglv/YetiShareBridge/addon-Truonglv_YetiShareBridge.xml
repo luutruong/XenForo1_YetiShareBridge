@@ -131,10 +131,10 @@
   <code_events/>
   <code_event_listeners>
     <listener event_id="file_health_check" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
+    <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Login" active="1" hint="XenForo_ControllerPublic_Login" description="XenForo_ControllerPublic_Login"/>
     <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Account" active="1" hint="XenForo_ControllerPublic_Account" description="XenForo_ControllerPublic_Account"/>
     <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Logout" active="1" hint="XenForo_ControllerPublic_Logout" description="XenForo_ControllerPublic_Logout"/>
     <listener event_id="load_class_controller" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerAdmin_Log" active="1" hint="XenForo_ControllerAdmin_Log" description="XenForo_ControllerAdmin_Log"/>
-    <listener event_id="load_class_controller" execute_order="99999" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_ControllerPublic_Login" active="1" hint="" description="XenForo_ControllerPublic_Login"/>
     <listener event_id="load_class_datawriter" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_DataWriter_User" active="1" hint="XenForo_DataWriter_User" description="XenForo_DataWriter_User"/>
     <listener event_id="load_class_model" execute_order="1" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="load_class_XenForo_Model_UserUpgrade" active="1" hint="" description="XenForo_Model_UserUpgrade"/>
   </code_event_listeners>
