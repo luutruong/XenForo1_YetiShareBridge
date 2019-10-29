@@ -62,8 +62,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         self::log('Failed to update YetiShare user.'
             . ' $userId=' . $user['user_id']
             . ' $YetiShareAccountId=' . $updates['account_id']
-            . ' $error=' . $response['response']
-        );
+            . ' $error=' . $response['response']);
 
         return false;
     }
