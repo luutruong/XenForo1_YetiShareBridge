@@ -32,7 +32,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
             $freePackage = Truonglv_YetiShareBridge_Option::get('defaultPackage');
             $updates['package_id'] = $freePackage;
         } elseif (!empty($changes['is_upgrade'])) {
-            $vipPackageId = (int) Truonglv_YetiShareBridge_Option::get('vipPackageId');
+            $vipPackageId = Truonglv_YetiShareBridge_Option::getVIPPackageForUser($user);
             if ($vipPackageId > 0) {
                 $updates['package_id'] = $vipPackageId;
 
@@ -55,7 +55,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         self::_ensureAccessTokenLoaded();
         $response = self::_request('POST', self::ENDPOINT_ACCOUNT_EDIT, $updates);
 
-        if (self::_isAccessTokenInvalid($response)) {
+        if (self::_expectResponseData($response, array('id'))) {
             return $response['data'];
         }
 
@@ -87,11 +87,9 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
             return false;
         }
 
-        if (Truonglv_YetiShareBridge_Option::isUserVIP($user)) {
-            $vipPackage = (int) Truonglv_YetiShareBridge_Option::get('vipPackageId');
-            if ($vipPackage > 0) {
-                $defaultPackage = $vipPackage;
-            }
+        $vipPackage = Truonglv_YetiShareBridge_Option::getVIPPackageForUser($user);
+        if ($vipPackage > 0) {
+            $defaultPackage = $vipPackage;
         }
 
         self::_ensureAccessTokenLoaded();
@@ -149,17 +147,11 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         return self::_expectResponseData($response, 'id');
     }
 
-    /**
-     * @param string $apiKey1
-     * @param string $apiKey2
-     * @return array|null
-     * @throws XenForo_Exception
-     */
-    public static function fetchAccessToken($apiKey1, $apiKey2)
+    public static function fetchAccessToken($username, $password)
     {
         $response = self::_request('POST', self::ENDPOINT_AUTHORIZE, [
-            'key1' => $apiKey1,
-            'key2' => $apiKey2
+            'username' => $username,
+            'password' => $password
         ]);
 
         return self::_expectResponseData($response, array('access_token'));
@@ -205,29 +197,25 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
     protected static function _ensureAccessTokenLoaded()
     {
         $accessToken = Truonglv_YetiShareBridge_Option::get('accessToken');
-        $apiKey1 = Truonglv_YetiShareBridge_Option::get('apiKey1');
-        $apiKey2 = Truonglv_YetiShareBridge_Option::get('apiKey2');
+        $username = Truonglv_YetiShareBridge_Option::get('username');
+        $password = Truonglv_YetiShareBridge_Option::get('password');
 
         if (empty($accessToken) || empty($accessToken['hash'])) {
             $shouldReload = true;
         } else {
-            $shouldReload = md5($apiKey1 . $apiKey2) !== $accessToken['hash'];
+            $shouldReload = md5($username . $password) !== $accessToken['hash'];
         }
 
         if ($shouldReload) {
-            $token = self::_request('POST', self::ENDPOINT_AUTHORIZE, [
-                'key1' => $apiKey1,
-                'key2' => $apiKey2
-            ]);
+            $token = self::fetchAccessToken($username, $password);
 
-            if (!$token || (isset($token['status']) && $token['status'] === 'error')) {
-                throw new XenForo_Exception('Fetch access token with error: '
-                    . $token['response']);
+            if (!$token) {
+                throw new XenForo_Exception('Fetch access token error');
             }
 
-            $tokenArray = $token['data'];
-            $tokenArray['_datetime'] = $token['_datetime'];
-            $tokenArray['hash'] = md5($apiKey1 . $apiKey2);
+            $tokenArray = $token;
+            $tokenArray['_datetime'] = date('Y-m-d H:i:s', time());
+            $tokenArray['hash'] = md5($username . $password);
 
             self::_updateOption($tokenArray);
         }

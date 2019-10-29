@@ -16,24 +16,95 @@ class Truonglv_YetiShareBridge_Option
 
     /**
      * @param array $user
-     * @return bool
+     * @return int
+     * @throws XenForo_Exception
      */
-    public static function isUserVIP(array $user)
+    public static function getVIPPackageForUser(array $user)
     {
-        $vipGroupId = (int) self::get('vipGroupId');
-        if ($vipGroupId <= 0) {
-            return false;
+        $vipMapping = self::get('vipMapping');
+        if (empty($vipMapping)) {
+            return 0;
         }
 
-        $userGroupIds = array($user['user_group_id']);
-        if (!empty($user['secondary_group_ids'])) {
-            $ids = explode(',', $user['secondary_group_ids']);
-            $userGroupIds = array_merge($userGroupIds, $ids);
-            $userGroupIds = array_unique($userGroupIds);
+        /** @var XenForo_Model_User $userModel */
+        $userModel = XenForo_Model::create('XenForo_Model_User');
+        foreach ($vipMapping as $value) {
+            if ($userModel->isMemberOfUserGroup($user, $value['user_group_id'])) {
+                return $value['package_id'];
+            }
         }
 
-        $userGroupIds = array_map('intval', $userGroupIds);
-        return in_array($vipGroupId, $userGroupIds, true);
+        return 0;
+    }
+
+    public static function renderVIPMapping(XenForo_View $view, $fieldPrefix, array $preparedOption, $canEdit)
+    {
+        $packages = array();
+        try {
+            $packages = Truonglv_YetiShareBridge_Helper_YetiShare::getPackageListing();
+        } catch (\Exception $e) {
+            Truonglv_YetiShareBridge_Helper_YetiShare::log($e);
+        }
+
+        $choices = $preparedOption['option_value'];
+
+        $packageOptions = array(
+            array(
+                'value' => 0,
+                'label' => '(' . new XenForo_Phrase('unspecified') . ')'
+            )
+        );
+        if (isset($packages['data'], $packages['data']['packages'])) {
+            unset($packageOptions[0]);
+
+            foreach ($packages['data']['packages'] as $package) {
+                $packageOptions[] = array(
+                    'value' => $package['id'],
+                    'label' => $package['label'],
+                    'selected' => $package['id'] == $preparedOption['option_value']
+                );
+            }
+        }
+
+        $unspecifiedPhrase = '(' . new XenForo_Phrase('unspecified') . ')';
+        $userGroups = XenForo_Option_UserGroupChooser::getUserGroupOptions(0, $unspecifiedPhrase);
+
+        $editLink = $view->createTemplateObject('option_list_option_editlink', array(
+            'preparedOption' => $preparedOption,
+            'canEditOptionDefinition' => $canEdit
+        ));
+
+        return $view->createTemplateObject('yetishare_bridge_option_template_vipMapping', array(
+            'fieldPrefix' => $fieldPrefix,
+            'listedFieldName' => $fieldPrefix . '_listed[]',
+            'preparedOption' => $preparedOption,
+            'editLink' => $editLink,
+
+            'packageOptions' => $packageOptions,
+            'userGroups' => $userGroups,
+            'choices' => $choices,
+            'nextCounter' => count($choices)
+        ));
+    }
+
+    public static function verifyOptionVIPMapping(&$values)
+    {
+        $output = array();
+
+        foreach ($values as $value) {
+            if (empty($value['user_group_id']) || empty($value['package_id'])) {
+                continue;
+            }
+
+            $output[$value['user_group_id'] . $value['package_id']] = array(
+                'user_group_id' => $value['user_group_id'],
+                'package_id' => $value['package_id']
+            );
+        }
+
+        $values = array_values($output);
+
+        return true;
     }
 
     /** @noinspection PhpUnused */

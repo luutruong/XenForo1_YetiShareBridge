@@ -16,7 +16,7 @@ class Truonglv_YetiShareBridge_Deferred_Downgrade extends XenForo_Deferred_Abstr
             return true;
         }
 
-        if (Truonglv_YetiShareBridge_Option::isUserVIP($user)) {
+        if (Truonglv_YetiShareBridge_Option::getVIPPackageForUser($user) > 0) {
             return true;
         }
 

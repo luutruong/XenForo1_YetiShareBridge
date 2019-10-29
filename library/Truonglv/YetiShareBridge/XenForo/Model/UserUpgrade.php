@@ -9,7 +9,7 @@ class Truonglv_YetiShareBridge_XenForo_Model_UserUpgrade extends XFCP_Truonglv_Y
             $userModel = $this->_getUserModel();
             $user = $userModel->getUserById($userId);
 
-            if (Truonglv_YetiShareBridge_Option::isUserVIP($user)) {
+            if (Truonglv_YetiShareBridge_Option::getVIPPackageForUser($user) > 0) {
                 $upgradeRecord = $this->getActiveUserUpgradeRecordById($upgradeRecordId);
                 Truonglv_YetiShareBridge_Helper_YetiShare::upgradeUser($user, $upgradeRecord['end_date']);
             }
@@ -22,7 +22,7 @@ class Truonglv_YetiShareBridge_XenForo_Model_UserUpgrade extends XFCP_Truonglv_Y
     {
         $userIds = array();
         foreach ($upgrades as $upgrade) {
-            if (Truonglv_YetiShareBridge_Option::isUserVIP($upgrade)) {
+            if (Truonglv_YetiShareBridge_Option::getVIPPackageForUser($upgrade) > 0) {
                 $userIds[] = $upgrade['user_id'];
             }
         }
@@ -34,7 +34,7 @@ class Truonglv_YetiShareBridge_XenForo_Model_UserUpgrade extends XFCP_Truonglv_Y
             $users = $userModel->getUsersByIds($userIds);
 
             foreach ($users as $user) {
-                if (Truonglv_YetiShareBridge_Option::isUserVIP($user)) {
+                if (Truonglv_YetiShareBridge_Option::getVIPPackageForUser($user) > 0) {
                     continue;
                 }
 

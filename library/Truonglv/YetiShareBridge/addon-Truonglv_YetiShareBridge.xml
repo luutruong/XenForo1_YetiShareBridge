@@ -3,7 +3,57 @@
   <admin_navigation/>
   <admin_permissions/>
   <admin_style_properties/>
-  <admin_templates/>
+  <admin_templates>
+    <template title="yetishare_bridge_option_template_vipMapping"><![CDATA[<xen:require js="js/Truonglv/YetiShareBridge/options.min.js" />
+
+<style>
+	.YetiShareBridge_InputGroup {
+		display: flex;
+		align-items: center;
+	}
+	.YetiShareBridge_InputGroup .textCtrl {
+		margin-top: 0 !important;
+		margin-bottom: 0;
+	}
+	.YetiShareBridge_InputSpacer {
+		width: 20px;
+	}
+</style>
+
+<xen:controlunit label="{$preparedOption.title}" hint="{$preparedOption.hint}">
+	<xen:explain>{xen:raw $preparedOption.explain}</xen:explain>
+	<xen:html>
+		<ul>
+			<xen:foreach loop="$choices" key="$counter" value="$choice">
+				<li class="CensorWordOptionListener YetiShareBridge_InputGroup">
+					<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][user_group_id]" 
+								value="{$choice.user_group_id}">
+						<xen:options source="{$userGroups}"/>
+					</xen:select>
+					<span class="YetiShareBridge_InputSpacer"></span>
+					<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][package_id]" 
+								value="{$choice.package_id}">
+						<xen:options source="{$packageOptions}"/>
+					</xen:select>
+				</li>
+			</xen:foreach>
+		
+			<li class="CensorWordOptionListener YetiShareBridge_InputGroup">
+				<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][user_group_id]">
+					<xen:options source="{$userGroups}"/>
+				</xen:select>
+				<span class="YetiShareBridge_InputSpacer"></span>
+				<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][package_id]">
+					<xen:options source="{$packageOptions}"/>
+				</xen:select>
+			</li>
+		</ul>
+		
+		<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />
+		{xen:raw $editLink}
+	</xen:html>
+</xen:controlunit>]]></template>
+  </admin_templates>
   <admin_template_modifications/>
   <code_events/>
   <code_event_listeners>
@@ -24,18 +74,6 @@
       <edit_format_params>Truonglv_YetiShareBridge_Option::renderAccessToken</edit_format_params>
       <sub_options>*</sub_options>
       <relation group_id="Truonglv_YetiShareBridge" display_order="1"/>
-    </option>
-    <option option_id="YetiShareBridge_apiKey1" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value></default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="Truonglv_YetiShareBridge" display_order="15"/>
-    </option>
-    <option option_id="YetiShareBridge_apiKey2" edit_format="textbox" data_type="string" can_backup="1">
-      <default_value></default_value>
-      <edit_format_params></edit_format_params>
-      <sub_options></sub_options>
-      <relation group_id="Truonglv_YetiShareBridge" display_order="16"/>
     </option>
     <option option_id="YetiShareBridge_apiUrl" edit_format="textbox" data_type="string" can_backup="1">
       <default_value></default_value>
@@ -61,16 +99,22 @@
       <sub_options></sub_options>
       <relation group_id="Truonglv_YetiShareBridge" display_order="220"/>
     </option>
-    <option option_id="YetiShareBridge_vipGroupId" edit_format="callback" data_type="unsigned_integer" can_backup="1">
-      <default_value>0</default_value>
-      <edit_format_params>XenForo_Option_UserGroupChooser::renderSelect</edit_format_params>
+    <option option_id="YetiShareBridge_password" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params>type=password</edit_format_params>
       <sub_options></sub_options>
-      <relation group_id="Truonglv_YetiShareBridge" display_order="90"/>
+      <relation group_id="Truonglv_YetiShareBridge" display_order="16"/>
     </option>
-    <option option_id="YetiShareBridge_vipPackageId" edit_format="callback" data_type="unsigned_integer" can_backup="1">
-      <default_value>0</default_value>
-      <edit_format_params>Truonglv_YetiShareBridge_Option::renderYetiSharePackages</edit_format_params>
+    <option option_id="YetiShareBridge_username" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params></edit_format_params>
       <sub_options></sub_options>
+      <relation group_id="Truonglv_YetiShareBridge" display_order="15"/>
+    </option>
+    <option option_id="YetiShareBridge_vipMapping" edit_format="callback" data_type="array" can_backup="1" validation_class="Truonglv_YetiShareBridge_Option" validation_method="verifyOptionVIPMapping">
+      <default_value></default_value>
+      <edit_format_params>Truonglv_YetiShareBridge_Option::renderVIPMapping</edit_format_params>
+      <sub_options>*</sub_options>
       <relation group_id="Truonglv_YetiShareBridge" display_order="30"/>
     </option>
   </optiongroups>
@@ -84,10 +128,6 @@
     <phrase title="option_group_Truonglv_YetiShareBridge_description" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
     <phrase title="option_YetiShareBridge_accessToken" version_id="1000000" version_string="1.0.0"><![CDATA[Access token]]></phrase>
     <phrase title="option_YetiShareBridge_accessToken_explain" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
-    <phrase title="option_YetiShareBridge_apiKey1" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) API Key 1]]></phrase>
-    <phrase title="option_YetiShareBridge_apiKey1_explain" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
-    <phrase title="option_YetiShareBridge_apiKey2" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) API Key 2]]></phrase>
-    <phrase title="option_YetiShareBridge_apiKey2_explain" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
     <phrase title="option_YetiShareBridge_apiUrl" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) API URL]]></phrase>
     <phrase title="option_YetiShareBridge_apiUrl_explain" version_id="1000000" version_string="1.0.0"><![CDATA[]]></phrase>
     <phrase title="option_YetiShareBridge_baseUrl" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) Base URL]]></phrase>
@@ -96,18 +136,20 @@
     <phrase title="option_YetiShareBridge_defaultPackage_explain" version_id="1000000" version_string="1.0.0"><![CDATA[Gói mặc định áp dụng cho tạo TV mới hoặc khi TV bị giáng chức khỏi nhóm VIP.]]></phrase>
     <phrase title="option_YetiShareBridge_encryptKey" version_id="1000000" version_string="1.0.0"><![CDATA[Encryption Key]]></phrase>
     <phrase title="option_YetiShareBridge_encryptKey_explain" version_id="1000000" version_string="1.0.0"><![CDATA[A secret key to encrypt data. This value must be match with YetiShare plugin settings.]]></phrase>
-    <phrase title="option_YetiShareBridge_vipGroupId" version_id="1000000" version_string="1.0.0"><![CDATA[VIP Group ID]]></phrase>
-    <phrase title="option_YetiShareBridge_vipGroupId_explain" version_id="1000000" version_string="1.0.0"><![CDATA[Nhóm VIP khi TV trên diễn đàn này được nâng cấp lên nhóm này thì TV tương ứng bên Yetishare sẽ được nâng cấp lên nhóm VIP được chỉ định ở bên trên.]]></phrase>
-    <phrase title="option_YetiShareBridge_vipPackageId" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) VIP Package]]></phrase>
-    <phrase title="option_YetiShareBridge_vipPackageId_explain" version_id="1000000" version_string="1.0.0"><![CDATA[Khi TV bên diễn đàn XenForo được nâng cấp lên nhóm VIP (cấu hình bên dưới) thì TV tương ứng bên Yetishare sẽ được nâng cấp lên nhóm TV được chỉ định trong cấu hình này.]]></phrase>
+    <phrase title="option_YetiShareBridge_password" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) Admin password]]></phrase>
+    <phrase title="option_YetiShareBridge_password_explain" version_id="1000000" version_string="1.0.0"><![CDATA[Admin password account.]]></phrase>
+    <phrase title="option_YetiShareBridge_username" version_id="1000000" version_string="1.0.0"><![CDATA[(YetiShare) Admin username]]></phrase>
+    <phrase title="option_YetiShareBridge_username_explain" version_id="1000000" version_string="1.0.0"><![CDATA[The YetiShare admin username to login.]]></phrase>
+    <phrase title="option_YetiShareBridge_vipMapping" version_id="1000000" version_string="1.0.0"><![CDATA[VIP Mapping]]></phrase>
+    <phrase title="option_YetiShareBridge_vipMapping_explain" version_id="1000000" version_string="1.0.0"><![CDATA[Map from XenForo User Group to YetiShare package.]]></phrase>
     <phrase title="yetishare_bridge_account" version_id="1000000" version_string="1.0.0"><![CDATA[Account]]></phrase>
-    <phrase title="yetishare_bridge_api_key_1" version_id="1000000" version_string="1.0.0"><![CDATA[Api Key1]]></phrase>
-    <phrase title="yetishare_bridge_api_key_2" version_id="1000000" version_string="1.0.0"><![CDATA[Api Key2]]></phrase>
     <phrase title="yetishare_bridge_associate" version_id="1000000" version_string="1.0.0"><![CDATA[Associate with YetiShare]]></phrase>
     <phrase title="yetishare_bridge_error_account_disabled" version_id="1000000" version_string="1.0.0"><![CDATA[Your YetiShare account has been disabled. Please connect with other or contact with administrator to resolve it.]]></phrase>
     <phrase title="yetishare_bridge_error_account_integrated_with_other" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare account has been integrated with other account.]]></phrase>
     <phrase title="yetishare_bridge_error_invalid_api_key" version_id="1000000" version_string="1.0.0"><![CDATA[Please enter a valid api key.]]></phrase>
     <phrase title="yetishare_bridge_integration" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare Integration]]></phrase>
+    <phrase title="yetishare_bridge_password" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare password]]></phrase>
+    <phrase title="yetishare_bridge_username" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare username]]></phrase>
     <phrase title="yetishare_bridge_your_account_is_not_currently_associated_with_yetishare_account" version_id="1000000" version_string="1.0.0"><![CDATA[Your account is not currently associated with YetiShare account.<br/>
 To associate with your YetiShare account you may provide api key1 and api key2 from your account setting in YetiShare.]]></phrase>
   </phrases>
@@ -130,16 +172,16 @@ To associate with your YetiShare account you may provide api key1 and api key2 f
 			</dl>
 			
 			<dl class="ctrlUnit">
-				<dt>{xen:phrase yetishare_bridge_api_key_1}:</dt>
+				<dt>{xen:phrase yetishare_bridge_username}:</dt>
 				<dd>
-					<input type="text" name="api_key1" value="" class="textCtrl" id="ctrl_api_key1"/>
+					<input type="text" name="username" value="" class="textCtrl" id="ctrl_api_key1"/>
 				</dd>
 			</dl>
 			
 			<dl class="ctrlUnit">
-				<dt>{xen:phrase yetishare_bridge_api_key_2}:</dt>
+				<dt>{xen:phrase yetishare_bridge_password}:</dt>
 				<dd>
-					<input type="text" name="api_key2" value="" class="textCtrl" id="ctrl_api_key2"/>
+					<input type="password" name="password" value="" class="textCtrl" id="ctrl_api_key2"/>
 				</dd>
 			</dl>
 			
