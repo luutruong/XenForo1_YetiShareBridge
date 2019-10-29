@@ -104,6 +104,8 @@
     <phrase title="yetishare_bridge_api_key_1" version_id="1000000" version_string="1.0.0"><![CDATA[Api Key1]]></phrase>
     <phrase title="yetishare_bridge_api_key_2" version_id="1000000" version_string="1.0.0"><![CDATA[Api Key2]]></phrase>
     <phrase title="yetishare_bridge_associate" version_id="1000000" version_string="1.0.0"><![CDATA[Associate with YetiShare]]></phrase>
+    <phrase title="yetishare_bridge_error_account_disabled" version_id="1000000" version_string="1.0.0"><![CDATA[Your YetiShare account has been disabled. Please connect with other or contact with administrator to resolve it.]]></phrase>
+    <phrase title="yetishare_bridge_error_account_integrated_with_other" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare account has been integrated with other account.]]></phrase>
     <phrase title="yetishare_bridge_error_invalid_api_key" version_id="1000000" version_string="1.0.0"><![CDATA[Please enter a valid api key.]]></phrase>
     <phrase title="yetishare_bridge_integration" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare Integration]]></phrase>
     <phrase title="yetishare_bridge_your_account_is_not_currently_associated_with_yetishare_account" version_id="1000000" version_string="1.0.0"><![CDATA[Your account is not currently associated with YetiShare account.<br/>
