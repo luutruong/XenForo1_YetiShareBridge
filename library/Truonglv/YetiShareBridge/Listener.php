@@ -35,13 +35,6 @@ class Truonglv_YetiShareBridge_Listener
         }
     }
 
-    public static function load_class_XenForo_Model_Session($class, array &$extend)
-    {
-        if ($class === 'XenForo_Model_Session') {
-            $extend[] = 'Truonglv_YetiShareBridge_XenForo_Model_Session';
-        }
-    }
-
     public static function load_class_XenForo_ControllerPublic_Logout($class, array &$extend)
     {
         if ($class === 'XenForo_ControllerPublic_Logout') {
