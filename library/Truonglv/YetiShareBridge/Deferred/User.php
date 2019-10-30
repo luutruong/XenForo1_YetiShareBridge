@@ -51,7 +51,15 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
             $user['user_id']
         );
         if (!empty($associated)) {
-            return;
+            $info = Truonglv_YetiShareBridge_Helper_YetiShare::fetchAccountInfo(
+                $associated['provider_key']
+            );
+            if (empty($info['id'])) {
+                $userExternalModel->deleteExternalAuthAssociationForUser(
+                    Truonglv_YetiShareBridge_Helper_YetiShare::PROVIDER_EXTERNAL_USER,
+                    $user['user_id']
+                );
+            }
         }
 
         $YetiShareUser = Truonglv_YetiShareBridge_Helper_YetiShare::findUser($user['email']);
@@ -65,7 +73,7 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
                     $username = sprintf('%s%02d', $username, $suffix);
                 }
 
-                $userByName = Truonglv_YetiShareBridge_Helper_YetiShare::findUser($user['username']);
+                $userByName = Truonglv_YetiShareBridge_Helper_YetiShare::findUser($username);
                 if (empty($userByName)) {
                     $foundByUser = $username;
 

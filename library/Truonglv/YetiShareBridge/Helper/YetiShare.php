@@ -89,8 +89,38 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         }
 
         $vipPackage = Truonglv_YetiShareBridge_Option::getVIPPackageForUser($user);
+        $expirationDate = 0;
         if ($vipPackage > 0) {
             $defaultPackage = $vipPackage;
+            // find the longest expiration user upgrade.
+
+            $db = XenForo_Application::getDb();
+            $results = $db->fetchAll('
+                SELECT active.*, upgrade.*
+                FROM xf_user_upgrade_active AS active
+                    INNER JOIN xf_user_upgrade AS upgrade ON
+                        (upgrade.user_upgrade_id = active.user_upgrade_id)
+                WHERE active.user_id = ?
+                ORDER BY active.end_date DESC
+            ', array($user['user_id']));
+
+            $vipMapping = Truonglv_YetiShareBridge_Option::get('vipMapping');
+            foreach ($results as $result) {
+                $userGroupIds = explode(',', $result['extra_group_ids']);
+                $userGroupIds = array_map('intval', $userGroupIds);
+
+                if (empty($userGroupIds)) {
+                    continue;
+                }
+
+                foreach ($vipMapping as $map) {
+                    if (in_array($map[Truonglv_YetiShareBridge_Option::KEY_USER_GROUP_ID], $userGroupIds, true)) {
+                        $expirationDate = $result['end_date'];
+
+                        break (2);
+                    }
+                }
+            }
         }
 
         self::_ensureAccessTokenLoaded();
@@ -105,6 +135,9 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
             'firstname' => $user['username'],
             'lastname' => $user['username']
         );
+        if ($expirationDate > 0) {
+            $payload['paid_expiry_date'] = date('Y-m-d H:i:s', $expirationDate);
+        }
 
         $response = self::_request('POST', self::ENDPOINT_ACCOUNT_CREATE, $payload);
         if (isset($response['data'], $response['data']['id'])) {
@@ -157,10 +190,9 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
         return self::$_packages;
     }
 
-    public static function fetchAccountInfo($accountId, $accessToken)
+    public static function fetchAccountInfo($accountId)
     {
         $response = self::_request('GET', self::ENDPOINT_ACCOUNT_INFO, array(
-            'access_token' => $accessToken,
             'account_id' => $accountId
         ));
 

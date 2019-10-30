@@ -17,7 +17,22 @@ class Truonglv_YetiShareBridge_Option
      */
     public static function get($key, $subKey = null)
     {
-        return XenForo_Application::getOptions()->get(self::OPTION_PREFIX . $key, $subKey);
+        $value = XenForo_Application::getOptions()->get(self::OPTION_PREFIX . $key, $subKey);
+
+        if ($key === 'vipMapping') {
+            foreach ($value as &$item) {
+                if (!isset($item[self::KEY_PRIORITY])) {
+                    $item[self::KEY_PRIORITY] = 0;
+                }
+            }
+            unset($item);
+
+            uasort($value, function ($a, $b) {
+                return $b[self::KEY_PRIORITY] - $a[self::KEY_PRIORITY];
+            });
+        }
+
+        return $value;
     }
 
     /**
@@ -42,17 +57,6 @@ class Truonglv_YetiShareBridge_Option
 
             $user = self::$_loadedUsers[$user['user_id']];
         }
-
-        foreach ($vipMapping as &$value) {
-            if (!isset($value[self::KEY_PRIORITY])) {
-                $value[self::KEY_PRIORITY] = 0;
-            }
-        }
-        unset($value);
-
-        uasort($vipMapping, function ($a, $b) {
-            return $b[self::KEY_PRIORITY] - $a[self::KEY_PRIORITY];
-        });
 
         foreach ($vipMapping as $value) {
             if ($userModel->isMemberOfUserGroup($user, $value[self::KEY_USER_GROUP_ID])) {
