@@ -59,7 +59,7 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
             $suffix = 0;
             $foundByUser = null;
 
-            while ($suffix < 10) {
+            while ($suffix < 50) {
                 $username = $user['username'];
                 if ($suffix > 0) {
                     $username = sprintf('%s%02d', $username, $suffix);
@@ -76,7 +76,9 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
             }
 
             if ($foundByUser === null) {
-                throw new XenForo_Exception('Too many retry to detect username!');
+                throw new XenForo_Exception('Too many retry to detect username!'
+                    . ' $username=' . $user['username']
+                    . ' $email=' . $user['email']);
             }
 
             $userData = array_replace($user, array(
