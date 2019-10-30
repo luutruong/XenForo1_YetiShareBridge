@@ -4,6 +4,10 @@ class Truonglv_YetiShareBridge_Option
 {
     const OPTION_PREFIX = 'YetiShareBridge_';
 
+    const KEY_PACKAGE_ID = 'package_id';
+    const KEY_PRIORITY = 'priority';
+    const KEY_USER_GROUP_ID = 'user_group_id';
+
     /**
      * @param string $key
      * @param string|null $subKey
@@ -26,11 +30,21 @@ class Truonglv_YetiShareBridge_Option
             return 0;
         }
 
+        foreach ($vipMapping as &$value) {
+            if (!isset($value[self::KEY_PRIORITY])) {
+                $value[self::KEY_PRIORITY] = 0;
+            }
+        }
+
+        uasort($vipMapping, function ($a, $b) {
+            return $b[self::KEY_PRIORITY] - $a[self::KEY_PRIORITY];
+        });
+
         /** @var XenForo_Model_User $userModel */
         $userModel = XenForo_Model::create('XenForo_Model_User');
         foreach ($vipMapping as $value) {
-            if ($userModel->isMemberOfUserGroup($user, $value['user_group_id'])) {
-                return $value['package_id'];
+            if ($userModel->isMemberOfUserGroup($user, $value[self::KEY_USER_GROUP_ID])) {
+                return $value[self::KEY_PACKAGE_ID];
             }
         }
 
@@ -83,7 +97,11 @@ class Truonglv_YetiShareBridge_Option
             'packageOptions' => $packageOptions,
             'userGroups' => $userGroups,
             'choices' => $choices,
-            'nextCounter' => count($choices)
+            'nextCounter' => count($choices),
+
+            'keyUserGroupId' => self::KEY_USER_GROUP_ID,
+            'keyPackageId' => self::KEY_PACKAGE_ID,
+            'keyPriority' => self::KEY_PRIORITY
         ));
     }
 
@@ -92,17 +110,21 @@ class Truonglv_YetiShareBridge_Option
         $output = array();
 
         foreach ($values as $value) {
-            if (empty($value['user_group_id']) || empty($value['package_id'])) {
+            if (empty($value[self::KEY_USER_GROUP_ID]) || empty($value[self::KEY_PACKAGE_ID])) {
                 continue;
             }
 
-            $output[$value['user_group_id'] . $value['package_id']] = array(
-                'user_group_id' => $value['user_group_id'],
-                'package_id' => $value['package_id']
+            $output[$value[self::KEY_USER_GROUP_ID] . $value[self::KEY_PACKAGE_ID]] = array(
+                self::KEY_USER_GROUP_ID => $value[self::KEY_USER_GROUP_ID],
+                self::KEY_PACKAGE_ID => $value[self::KEY_PACKAGE_ID],
+                self::KEY_PRIORITY => isset($value[self::KEY_PRIORITY]) ? intval($value[self::KEY_PRIORITY]) : 0
             );
         }
 
         $values = array_values($output);
+        uasort($values, function ($a, $b) {
+            return $b[self::KEY_PRIORITY] - $a[self::KEY_PRIORITY];
+        });
 
         return true;
     }

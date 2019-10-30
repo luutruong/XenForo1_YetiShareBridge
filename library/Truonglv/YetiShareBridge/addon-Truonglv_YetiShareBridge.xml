@@ -98,27 +98,33 @@
 	<xen:html>
 		<ul>
 			<xen:foreach loop="$choices" key="$counter" value="$choice">
-				<li class="CensorWordOptionListener YetiShareBridge_InputGroup">
-					<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][user_group_id]" 
-								value="{$choice.user_group_id}">
+				<li class="YetiShareBridge_InputGroup">
+					<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][{$keyUserGroupId}]" 
+								value="{$choice.{$keyUserGroupId}}">
 						<xen:options source="{$userGroups}"/>
 					</xen:select>
 					<span class="YetiShareBridge_InputSpacer"></span>
-					<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][package_id]" 
-								value="{$choice.package_id}">
+					<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][{$keyPackageId}]" 
+								value="{$choice.{$keyPackageId}}">
 						<xen:options source="{$packageOptions}"/>
 					</xen:select>
+					<span class="YetiShareBridge_InputSpacer"></span>
+					<xen:textbox name="{$fieldPrefix}[{$preparedOption.option_id}][{$counter}][{$keyPriority}]" 
+							 value="{xen:if 'isset({$choice.{$keyPriority}})', '{$choice.{$keyPriority}}', '0'}" placeholder="{xen:phrase yetishare_bridge_priority}"/>
 				</li>
 			</xen:foreach>
 		
 			<li class="CensorWordOptionListener YetiShareBridge_InputGroup">
-				<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][user_group_id]">
+				<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][{$keyUserGroupId}]">
 					<xen:options source="{$userGroups}"/>
 				</xen:select>
 				<span class="YetiShareBridge_InputSpacer"></span>
-				<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][package_id]">
+				<xen:select name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][{$keyPackageId}]">
 					<xen:options source="{$packageOptions}"/>
 				</xen:select>
+				<span class="YetiShareBridge_InputSpacer"></span>
+				<xen:textbox name="{$fieldPrefix}[{$preparedOption.option_id}][{$nextCounter}][{$keyPriority}]" 
+							 value="" placeholder="{xen:phrase yetishare_bridge_priority}"/>
 			</li>
 		</ul>
 		
@@ -242,6 +248,7 @@ $0]]></replace>
     <phrase title="yetishare_bridge_log_entry" version_id="1000100" version_string="1.0.1"><![CDATA[Log Entry]]></phrase>
     <phrase title="yetishare_bridge_log_info" version_id="1000100" version_string="1.0.1"><![CDATA[Log Info]]></phrase>
     <phrase title="yetishare_bridge_password" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare password]]></phrase>
+    <phrase title="yetishare_bridge_priority" version_id="1000201" version_string="1.0.2"><![CDATA[Priority]]></phrase>
     <phrase title="yetishare_bridge_request_data" version_id="1000100" version_string="1.0.1"><![CDATA[Request Data]]></phrase>
     <phrase title="yetishare_bridge_response_data" version_id="1000100" version_string="1.0.1"><![CDATA[Response Data]]></phrase>
     <phrase title="yetishare_bridge_username" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare username]]></phrase>
