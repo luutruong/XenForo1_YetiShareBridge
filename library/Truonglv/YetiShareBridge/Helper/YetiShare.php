@@ -6,6 +6,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
     const ENDPOINT_ACCOUNT_CREATE = 'account/create';
     const ENDPOINT_ACCOUNT_EDIT = 'account/edit';
     const ENDPOINT_ACCOUNT_INFO = 'account/info';
+    const ENDPOINT_ACCOUNT_FIND = 'account/find';
     const ENDPOINT_PACKAGE_LISTING = 'package/listing';
 
     const PROVIDER_EXTERNAL_USER = 'YetiShare';
@@ -115,11 +116,30 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
                 $response['data']
             );
 
-            return true;
+            return $response['data'];
         } else {
             self::log('Failed to create YetiShare user for user. $id='
                 . $user['user_id']
                 . ' $error=' . $response['response']);
+        }
+
+        return false;
+    }
+
+    public static function findUser($usernameOrEmail)
+    {
+        self::_ensureAccessTokenLoaded();
+
+        $payload = array();
+        if (strpos($usernameOrEmail, '@') !== false) {
+            $payload['email'] = $usernameOrEmail;
+        } else {
+            $payload['username'] = $usernameOrEmail;
+        }
+
+        $response = self::_request('GET', self::ENDPOINT_ACCOUNT_FIND, $payload);
+        if (self::_expectResponseData($response, array('id'))) {
+            return $response['data'];
         }
 
         return false;

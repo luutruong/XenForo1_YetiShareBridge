@@ -127,7 +127,21 @@
 	</xen:html>
 </xen:controlunit>]]></template>
   </admin_templates>
-  <admin_template_modifications/>
+  <admin_template_modifications>
+    <modification template="tools_rebuild" modification_key="yetisharebridge_tools_rebuild" description="Add our rebuilds" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:form action="{xen:adminlink 'tools/clean-up-permissions'}">]]></find>
+      <replace><![CDATA[<xen:form action="{xen:adminlink 'tools/trigger-deferred'}">
+	<h2 class="subHeading">{xen:phrase yetishare_bridge_creating_yetishare_accounts}</h2>
+	<xen:spinboxunit name="options[batch]" value="100" step="50" 
+					 min="1" label="{xen:phrase items_to_process_per_page}:" />
+
+	<xen:submitunit save="{xen:phrase rebuild_now}" />
+	<input type="hidden" name="cache" value="Truonglv_YetiShareBridge_Deferred_User" />
+</xen:form>
+
+$0]]></replace>
+    </modification>
+  </admin_template_modifications>
   <code_events/>
   <code_event_listeners>
     <listener event_id="file_health_check" execute_order="10" callback_class="Truonglv_YetiShareBridge_Listener" callback_method="file_health_check" active="1" hint="" description=""/>
@@ -223,6 +237,7 @@
     <phrase title="yetishare_bridge_account" version_id="1000000" version_string="1.0.0"><![CDATA[Account]]></phrase>
     <phrase title="yetishare_bridge_api_logs" version_id="1000100" version_string="1.0.1"><![CDATA[Api Logs]]></phrase>
     <phrase title="yetishare_bridge_associate" version_id="1000000" version_string="1.0.0"><![CDATA[Associate with YetiShare]]></phrase>
+    <phrase title="yetishare_bridge_creating_yetishare_accounts" version_id="1000201" version_string="1.0.2"><![CDATA[[tl] YetiShare Bridge: Creating YetiShare Accounts]]></phrase>
     <phrase title="yetishare_bridge_error_account_disabled" version_id="1000000" version_string="1.0.0"><![CDATA[Your YetiShare account has been disabled. Please connect with other or contact with administrator to resolve it.]]></phrase>
     <phrase title="yetishare_bridge_error_account_integrated_with_other" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare account has been integrated with other account.]]></phrase>
     <phrase title="yetishare_bridge_error_invalid_api_key" version_id="1000000" version_string="1.0.0"><![CDATA[Please enter a valid api key.]]></phrase>
