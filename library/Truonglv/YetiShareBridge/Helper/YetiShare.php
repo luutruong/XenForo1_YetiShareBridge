@@ -114,7 +114,7 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
                 }
 
                 foreach ($vipMapping as $map) {
-                    if (in_array($map[Truonglv_YetiShareBridge_Option::KEY_USER_GROUP_ID], $userGroupIds, true)) {
+                    if (in_array($map[Truonglv_YetiShareBridge_Option::KEY_USER_GROUP_ID], $userGroupIds)) {
                         $expirationDate = $result['end_date'];
 
                         break (2);
