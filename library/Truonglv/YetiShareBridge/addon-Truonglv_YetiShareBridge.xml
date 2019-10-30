@@ -238,9 +238,6 @@ $0]]></replace>
     <phrase title="yetishare_bridge_api_logs" version_id="1000100" version_string="1.0.1"><![CDATA[Api Logs]]></phrase>
     <phrase title="yetishare_bridge_associate" version_id="1000000" version_string="1.0.0"><![CDATA[Associate with YetiShare]]></phrase>
     <phrase title="yetishare_bridge_creating_yetishare_accounts" version_id="1000201" version_string="1.0.2"><![CDATA[[tl] YetiShare Bridge: Creating YetiShare Accounts]]></phrase>
-    <phrase title="yetishare_bridge_error_account_disabled" version_id="1000000" version_string="1.0.0"><![CDATA[Your YetiShare account has been disabled. Please connect with other or contact with administrator to resolve it.]]></phrase>
-    <phrase title="yetishare_bridge_error_account_integrated_with_other" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare account has been integrated with other account.]]></phrase>
-    <phrase title="yetishare_bridge_error_invalid_api_key" version_id="1000000" version_string="1.0.0"><![CDATA[Please enter a valid api key.]]></phrase>
     <phrase title="yetishare_bridge_integration" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare Integration]]></phrase>
     <phrase title="yetishare_bridge_log_entry" version_id="1000100" version_string="1.0.1"><![CDATA[Log Entry]]></phrase>
     <phrase title="yetishare_bridge_log_info" version_id="1000100" version_string="1.0.1"><![CDATA[Log Info]]></phrase>
