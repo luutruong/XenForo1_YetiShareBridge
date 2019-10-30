@@ -59,6 +59,9 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
                     Truonglv_YetiShareBridge_Helper_YetiShare::PROVIDER_EXTERNAL_USER,
                     $user['user_id']
                 );
+            } else {
+                // that is existing. Keep it.
+                return;
             }
         }
 
@@ -84,7 +87,7 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
             }
 
             if ($foundByUser === null) {
-                throw new XenForo_Exception('Too many retry to detect username!'
+                throw new XenForo_Exception('Failed to create YetiShare account'
                     . ' $username=' . $user['username']
                     . ' $email=' . $user['email']);
             }
