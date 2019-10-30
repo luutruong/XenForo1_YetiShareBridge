@@ -21,13 +21,6 @@ class Truonglv_YetiShareBridge_Listener
         }
     }
 
-    public static function load_class_XenForo_ControllerPublic_Account($class, array &$extend)
-    {
-        if ($class === 'XenForo_ControllerPublic_Account') {
-            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Account';
-        }
-    }
-
     public static function load_class_XenForo_Model_UserUpgrade($class, array &$extend)
     {
         if ($class === 'XenForo_Model_UserUpgrade') {
@@ -39,13 +32,6 @@ class Truonglv_YetiShareBridge_Listener
     {
         if ($class === 'XenForo_ControllerPublic_Logout') {
             $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Logout';
-        }
-    }
-
-    public static function load_class_XenForo_ControllerAdmin_Tools($class, array &$extend)
-    {
-        if ($class === 'XenForo_ControllerAdmin_Tools') {
-            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerAdmin_Tools';
         }
     }
 
