@@ -48,6 +48,7 @@ class Truonglv_YetiShareBridge_Option
                 $value[self::KEY_PRIORITY] = 0;
             }
         }
+        unset($value);
 
         uasort($vipMapping, function ($a, $b) {
             return $b[self::KEY_PRIORITY] - $a[self::KEY_PRIORITY];
