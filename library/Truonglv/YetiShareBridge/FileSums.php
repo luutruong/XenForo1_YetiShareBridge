@@ -8,7 +8,7 @@ class Truonglv_YetiShareBridge_FileSums
             'js/Truonglv/YetiShareBridge/options.min.js' => 'ea63a961f6e12b1ff0a42820461d12fe',
             'library/Truonglv/YetiShareBridge/CronEntry/Auto.php' => '4866fe0dbada23152ce81e701031d293',
             'library/Truonglv/YetiShareBridge/Deferred/Downgrade.php' => '7c18c47448bdd90bcf6fdd0245011429',
-            'library/Truonglv/YetiShareBridge/Deferred/User.php' => 'f09bfa52b4110c4561d84b6bd5adc904',
+            'library/Truonglv/YetiShareBridge/Deferred/User.php' => '99e00f1040da4785cb5e837e4f42aed5',
             'library/Truonglv/YetiShareBridge/Helper/Encrypt.php' => 'e0d5a3e80d19c7e7dc61d812a8ba6384',
             'library/Truonglv/YetiShareBridge/Helper/Yetishare.php' => 'e07d491452d20a7499864d5d2555fa50',
             'library/Truonglv/YetiShareBridge/Installer.php' => '0d474bd11b928d183aac9a52a2d4a9e8',

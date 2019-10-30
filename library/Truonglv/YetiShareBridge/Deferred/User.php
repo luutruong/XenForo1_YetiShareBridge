@@ -70,7 +70,7 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
             $suffix = 0;
             $foundByUser = null;
 
-            while ($suffix < 50) {
+            while ($suffix < 10) {
                 $username = $user['username'];
                 if ($suffix > 0) {
                     $username = sprintf('%s%02d', $username, $suffix);
@@ -87,9 +87,11 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
             }
 
             if ($foundByUser === null) {
-                throw new XenForo_Exception('Failed to create YetiShare account'
-                    . ' $username=' . $user['username']
-                    . ' $email=' . $user['email']);
+                $e = new XenForo_Exception('Failed to create YetiShare account'
+                    . ' $userId=' . $user['user_id']);
+                XenForo_Error::logException($e, false, '[tl] YetiShare Bridge: ');
+
+                return;
             }
 
             $userData = array_replace($user, array(
