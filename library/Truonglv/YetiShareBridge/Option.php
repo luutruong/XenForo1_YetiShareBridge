@@ -8,6 +8,8 @@ class Truonglv_YetiShareBridge_Option
     const KEY_PRIORITY = 'priority';
     const KEY_USER_GROUP_ID = 'user_group_id';
 
+    protected static $_loadedUsers = array();
+
     /**
      * @param string $key
      * @param string|null $subKey
@@ -30,6 +32,17 @@ class Truonglv_YetiShareBridge_Option
             return 0;
         }
 
+        /** @var XenForo_Model_User $userModel */
+        $userModel = XenForo_Model::create('XenForo_Model_User');
+
+        if (!isset($user['user_group_id']) || !isset($user['secondary_group_ids'])) {
+            if (!isset(self::$_loadedUsers[$user['user_id']])) {
+                self::$_loadedUsers[$user['user_id']] = $userModel->getUserById($user['user_id']);
+            }
+
+            $user = self::$_loadedUsers[$user['user_id']];
+        }
+
         foreach ($vipMapping as &$value) {
             if (!isset($value[self::KEY_PRIORITY])) {
                 $value[self::KEY_PRIORITY] = 0;
@@ -40,8 +53,6 @@ class Truonglv_YetiShareBridge_Option
             return $b[self::KEY_PRIORITY] - $a[self::KEY_PRIORITY];
         });
 
-        /** @var XenForo_Model_User $userModel */
-        $userModel = XenForo_Model::create('XenForo_Model_User');
         foreach ($vipMapping as $value) {
             if ($userModel->isMemberOfUserGroup($user, $value[self::KEY_USER_GROUP_ID])) {
                 return $value[self::KEY_PACKAGE_ID];
