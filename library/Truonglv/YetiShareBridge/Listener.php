@@ -48,4 +48,11 @@ class Truonglv_YetiShareBridge_Listener
             $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register';
         }
     }
+
+    public static function load_class_XenForo_ControllerPublic_Account($class, array &$extend)
+    {
+        if ($class === 'XenForo_ControllerPublic_Account') {
+            $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Account';
+        }
+    }
 }

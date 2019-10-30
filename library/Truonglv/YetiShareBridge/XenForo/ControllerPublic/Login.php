@@ -10,6 +10,7 @@ class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Login extends XFCP_Truon
             $redirect,
             $this->_request->getClientIp()
         );
+
         if ($ssoLoginUrl !== null) {
             $redirect = $ssoLoginUrl;
         }
