@@ -132,19 +132,37 @@
 		{xen:raw $editLink}
 	</xen:html>
 </xen:controlunit>]]></template>
-  </admin_templates>
-  <admin_template_modifications>
-    <modification template="tools_rebuild" modification_key="yetisharebridge_tools_rebuild" description="Add our rebuilds" execution_order="10" enabled="1" action="str_replace">
-      <find><![CDATA[<xen:form action="{xen:adminlink 'tools/clean-up-permissions'}">]]></find>
-      <replace><![CDATA[<xen:form action="{xen:adminlink 'tools/trigger-deferred'}">
+    <template title="yetishare_bridge_tools_rebuild"><![CDATA[<xen:form action="{xen:adminlink 'tools/trigger-deferred'}">
 	<h2 class="subHeading">{xen:phrase yetishare_bridge_creating_yetishare_accounts}</h2>
+	
+	<xen:radiounit name="options[method]" value="api" 
+				   label="{xen:phrase yetishare_bridge_rebuilding_method}:">
+		<xen:option value="api">{xen:phrase yetishare_bridge_using_yetishare_api}</xen:option>
+		<xen:option value="db" label="{xen:phrase yetishare_bridge_connect_to_yetishare_database}">
+			<xen:textbox name="options[db][host]" 
+						 placeholder="{xen:phrase yetishare_bridge_database_host}"/>
+			<xen:textbox name="options[db][port]" value="3306" 
+						 placeholder="{xen:phrase yetishare_bridge_database_port}"/>
+			<xen:textbox name="options[db][username]" 
+						 placeholder="{xen:phrase yetishare_bridge_database_username}"/>
+			<xen:textbox name="options[db][password]" 
+						 placeholder="{xen:phrase yetishare_bridge_database_password}"/>
+			<xen:textbox name="options[db][dbname]" 
+						 placeholder="{xen:phrase yetishare_bridge_database_dbname}"/>
+		</xen:option>
+	</xen:radiounit>
+	
 	<xen:spinboxunit name="options[batch]" value="100" step="50" 
 					 min="1" label="{xen:phrase items_to_process_per_page}:" />
 
 	<xen:submitunit save="{xen:phrase rebuild_now}" />
 	<input type="hidden" name="cache" value="Truonglv_YetiShareBridge_Deferred_User" />
-</xen:form>
-
+</xen:form>]]></template>
+  </admin_templates>
+  <admin_template_modifications>
+    <modification template="tools_rebuild" modification_key="yetisharebridge_tools_rebuild" description="Add our rebuilds" execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<xen:form action="{xen:adminlink 'tools/clean-up-permissions'}">]]></find>
+      <replace><![CDATA[<xen:include template="yetishare_bridge_tools_rebuild"/>
 $0]]></replace>
     </modification>
   </admin_template_modifications>
@@ -244,15 +262,23 @@ $0]]></replace>
     <phrase title="yetishare_bridge_account" version_id="1000000" version_string="1.0.0"><![CDATA[Account]]></phrase>
     <phrase title="yetishare_bridge_api_logs" version_id="1000100" version_string="1.0.1"><![CDATA[Api Logs]]></phrase>
     <phrase title="yetishare_bridge_associate" version_id="1000000" version_string="1.0.0"><![CDATA[Associate with YetiShare]]></phrase>
+    <phrase title="yetishare_bridge_connect_to_yetishare_database" version_id="1000301" version_string="1.0.3"><![CDATA[Connect to YetiShare database]]></phrase>
     <phrase title="yetishare_bridge_creating_yetishare_accounts" version_id="1000201" version_string="1.0.2"><![CDATA[[tl] YetiShare Bridge: Creating YetiShare Accounts]]></phrase>
+    <phrase title="yetishare_bridge_database_dbname" version_id="1000301" version_string="1.0.3"><![CDATA[Database name]]></phrase>
+    <phrase title="yetishare_bridge_database_host" version_id="1000301" version_string="1.0.3"><![CDATA[Database host]]></phrase>
+    <phrase title="yetishare_bridge_database_password" version_id="1000301" version_string="1.0.3"><![CDATA[Database password]]></phrase>
+    <phrase title="yetishare_bridge_database_port" version_id="1000301" version_string="1.0.3"><![CDATA[Database port]]></phrase>
+    <phrase title="yetishare_bridge_database_username" version_id="1000301" version_string="1.0.3"><![CDATA[Database username]]></phrase>
     <phrase title="yetishare_bridge_integration" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare Integration]]></phrase>
     <phrase title="yetishare_bridge_log_entry" version_id="1000100" version_string="1.0.1"><![CDATA[Log Entry]]></phrase>
     <phrase title="yetishare_bridge_log_info" version_id="1000100" version_string="1.0.1"><![CDATA[Log Info]]></phrase>
     <phrase title="yetishare_bridge_password" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare password]]></phrase>
     <phrase title="yetishare_bridge_priority" version_id="1000201" version_string="1.0.2"><![CDATA[Priority]]></phrase>
+    <phrase title="yetishare_bridge_rebuilding_method" version_id="1000301" version_string="1.0.3"><![CDATA[Rebuilding Method]]></phrase>
     <phrase title="yetishare_bridge_request_data" version_id="1000100" version_string="1.0.1"><![CDATA[Request Data]]></phrase>
     <phrase title="yetishare_bridge_response_data" version_id="1000100" version_string="1.0.1"><![CDATA[Response Data]]></phrase>
     <phrase title="yetishare_bridge_username" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare username]]></phrase>
+    <phrase title="yetishare_bridge_using_yetishare_api" version_id="1000301" version_string="1.0.3"><![CDATA[Using YetiShare Api]]></phrase>
     <phrase title="yetishare_bridge_your_account_is_not_currently_associated_with_yetishare_account" version_id="1000000" version_string="1.0.0"><![CDATA[Your account is not currently associated with YetiShare account.<br/>
 To associate with your YetiShare account you may provide api key1 and api key2 from your account setting in YetiShare.]]></phrase>
   </phrases>
