@@ -48,4 +48,19 @@ class Truonglv_YetiShareBridge_XenForo_Model_UserUpgrade extends XFCP_Truonglv_Y
 
         return $response;
     }
+
+    public function updateActiveUpgradeEndDate($userUpgradeRecordId, $endDate)
+    {
+        parent::updateActiveUpgradeEndDate($userUpgradeRecordId, $endDate);
+
+        $record = $this->_getDb()->fetchRow('
+            SELECT active.*, user.*
+            FROM xf_user_upgrade_active AS active
+                LEFT JOIN xf_user AS user ON (user.user_id = active.user_id)
+            WHERE active.user_upgrade_record_id = ?
+        ', array($userUpgradeRecordId));
+        if (Truonglv_YetiShareBridge_Option::getVIPPackageForUser($record) > 0) {
+            Truonglv_YetiShareBridge_Helper_YetiShare::upgradeUser($record, $record['end_date']);
+        }
+    }
 }

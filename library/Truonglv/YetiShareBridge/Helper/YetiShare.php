@@ -37,8 +37,10 @@ class Truonglv_YetiShareBridge_Helper_YetiShare
             if ($vipPackageId > 0) {
                 $updates['package_id'] = $vipPackageId;
 
-                if (!empty($changes['upgrade_expiration_date'])) {
-                    $updates['paid_expiry_date'] = date('Y-m-d H:i:s', $changes['upgrade_expiration_date']);
+                if (array_key_exists('upgrade_expiration_date', $changes)) {
+                    $updates['paid_expiry_date'] = ($changes['upgrade_expiration_date'] > 0)
+                        ? date('Y-m-d H:i:s', $changes['upgrade_expiration_date'])
+                        : 0;
                 }
             }
         }
