@@ -15,6 +15,11 @@ class Truonglv_YetiShareBridge_Deferred_User extends XenForo_Deferred_Abstract
         }
     }
 
+    public function canCancel()
+    {
+        return true;
+    }
+
     public function execute(array $deferred, array $data, $targetRunTime, &$status)
     {
         $data = array_replace(array(
