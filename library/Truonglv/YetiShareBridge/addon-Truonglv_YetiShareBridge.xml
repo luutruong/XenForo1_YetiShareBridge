@@ -154,6 +154,8 @@
 	
 	<xen:spinboxunit name="options[batch]" value="100" step="50" 
 					 min="1" label="{xen:phrase items_to_process_per_page}:" />
+	<xen:spinboxunit name="options[position]" value="0" step="1" 
+					 min="0" label="{xen:phrase yetishare_bridge_start_rebuild_at_user_id}:" />
 
 	<xen:submitunit save="{xen:phrase rebuild_now}" />
 	<input type="hidden" name="cache" value="Truonglv_YetiShareBridge_Deferred_User" />
@@ -277,6 +279,7 @@ $0]]></replace>
     <phrase title="yetishare_bridge_rebuilding_method" version_id="1000301" version_string="1.0.3"><![CDATA[Rebuilding Method]]></phrase>
     <phrase title="yetishare_bridge_request_data" version_id="1000100" version_string="1.0.1"><![CDATA[Request Data]]></phrase>
     <phrase title="yetishare_bridge_response_data" version_id="1000100" version_string="1.0.1"><![CDATA[Response Data]]></phrase>
+    <phrase title="yetishare_bridge_start_rebuild_at_user_id" version_id="1000400" version_string="1.0.4"><![CDATA[Start rebuild at user ID]]></phrase>
     <phrase title="yetishare_bridge_username" version_id="1000000" version_string="1.0.0"><![CDATA[YetiShare username]]></phrase>
     <phrase title="yetishare_bridge_using_yetishare_api" version_id="1000301" version_string="1.0.3"><![CDATA[Using YetiShare Api]]></phrase>
     <phrase title="yetishare_bridge_your_account_is_not_currently_associated_with_yetishare_account" version_id="1000000" version_string="1.0.0"><![CDATA[Your account is not currently associated with YetiShare account.<br/>
