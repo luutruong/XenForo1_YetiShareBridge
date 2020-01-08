@@ -36,7 +36,9 @@ class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register extends XFCP_Tr
     {
         /** @var Truonglv_YetiShareBridge_XenForo_DataWriter_User $writer */
         $writer = parent::_setupExternalUser($data);
-        $writer->YetiShare_setUserPassword('');
+        $writer->YetiShare_setUserPassword(
+            XenForo_Application::generateRandomString(10)
+        );
 
         return $writer;
     }
