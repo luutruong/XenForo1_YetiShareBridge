@@ -26,4 +26,18 @@ class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register extends XFCP_Tr
 
         return $response;
     }
+
+    /**
+     * @param array $data
+     * @return XenForo_DataWriter
+     * @throws XenForo_ControllerResponse_Exception
+     */
+    protected function _setupExternalUser(array $data)
+    {
+        /** @var Truonglv_YetiShareBridge_XenForo_DataWriter_User $writer */
+        $writer = parent::_setupExternalUser($data);
+        $writer->YetiShare_setUserPassword('');
+
+        return $writer;
+    }
 }

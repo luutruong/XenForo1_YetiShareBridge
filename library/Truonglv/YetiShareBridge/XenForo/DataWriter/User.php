@@ -14,11 +14,19 @@ class Truonglv_YetiShareBridge_XenForo_DataWriter_User extends XFCP_Truonglv_Yet
         $requirePassword = false
     ) {
         $success = parent::setPassword($password, $passwordConfirm, $auth, $requirePassword);
-        if ($success && $password !== '') {
-            $this->_YetiShare_userPassword = $password;
+        if ($success && \strlen($password) > 0) {
+            $this->YetiShare_setUserPassword($password);
         }
 
         return $success;
+    }
+
+    /**
+     * @param string|null $password
+     */
+    public function YetiShare_setUserPassword($password)
+    {
+        $this->_YetiShare_userPassword = $password;
     }
 
     protected function _postSave()
@@ -39,11 +47,13 @@ class Truonglv_YetiShareBridge_XenForo_DataWriter_User extends XFCP_Truonglv_Yet
             if ($this->isChanged('user_state')) {
                 $changes['user_state'] = $this->get('user_state');
             }
-            if ($this->_YetiShare_userPassword !== null) {
+            if ($this->_YetiShare_userPassword !== null
+                && \strlen($this->_YetiShare_userPassword) > 0
+            ) {
                 $changes['password'] = $this->_YetiShare_userPassword;
             }
 
-            if (count($changes) > 0) {
+            if (\count($changes) > 0) {
                 Truonglv_YetiShareBridge_Helper_YetiShare::updateUser($userData, $changes);
             }
         }
