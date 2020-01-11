@@ -2,6 +2,63 @@
 
 class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register extends XFCP_Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register
 {
+    /**
+     * @var int
+     */
+    protected $_associatedUserId = 0;
+
+    public function actionFacebookRegister()
+    {
+        $response = parent::actionFacebookRegister();
+        if ($this->_associatedUserId > 0
+            && $response instanceof XenForo_ControllerResponse_Redirect
+        ) {
+            $ssoUrl = Truonglv_YetiShareBridge_Helper_YetiShare::getSSOUrl(
+                $this->_associatedUserId,
+                'login',
+                XenForo_Link::convertUriToAbsoluteUri($response->redirectTarget),
+                $this->_request->getClientIp()
+            );
+            if ($ssoUrl !== null) {
+                return $this->responseRedirect(
+                    XenForo_ControllerResponse_Redirect::RESOURCE_CANONICAL_PERMANENT,
+                    $ssoUrl
+                );
+            }
+        }
+
+        return $response;
+    }
+
+    public function actionGoogleRegister()
+    {
+        $response = parent::actionGoogleRegister();
+        if ($this->_associatedUserId > 0
+            && $response instanceof XenForo_ControllerResponse_Redirect
+        ) {
+            $ssoUrl = Truonglv_YetiShareBridge_Helper_YetiShare::getSSOUrl(
+                $this->_associatedUserId,
+                'login',
+                XenForo_Link::convertUriToAbsoluteUri($response->redirectTarget),
+                $this->_request->getClientIp()
+            );
+            if ($ssoUrl !== null) {
+                return $this->responseRedirect(
+                    XenForo_ControllerResponse_Redirect::RESOURCE_CANONICAL_PERMANENT,
+                    $ssoUrl
+                );
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param array $user
+     * @param array $extraParams
+     * @return XenForo_ControllerResponse_Redirect|XenForo_ControllerResponse_View
+     * @throws XenForo_Exception
+     */
     protected function _completeRegistration(array $user, array $extraParams = array())
     {
         $response = parent::_completeRegistration($user, $extraParams);
@@ -41,5 +98,19 @@ class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register extends XFCP_Tr
         );
 
         return $writer;
+    }
+
+    /**
+     * @return false|int
+     * @throws XenForo_ControllerResponse_Exception
+     */
+    protected function _associateExternalAccount()
+    {
+        $userId = parent::_associateExternalAccount();
+        if ($userId > 0) {
+            $this->_associatedUserId = $userId;
+        }
+
+        return $userId;
     }
 }
