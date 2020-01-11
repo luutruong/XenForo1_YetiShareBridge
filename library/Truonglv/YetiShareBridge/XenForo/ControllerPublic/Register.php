@@ -3,29 +3,37 @@
 class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register extends XFCP_Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register
 {
     /**
-     * @var int
+     * @var int|null
      */
-    protected $_associatedUserId = 0;
+    protected $_associatedUserId = null;
+
+    public function actionFacebook()
+    {
+        $response = parent::actionFacebook();
+
+        /** @var Truonglv_YetiShareBridge_XenForo_Model_UserExternal $userExternalModel */
+        $userExternalModel = $this->_getUserExternalModel();
+        $this->_YetiShare_handleResponse($response, $userExternalModel->getYetiShareAssociateUserId());
+
+        return $response;
+    }
 
     public function actionFacebookRegister()
     {
         $response = parent::actionFacebookRegister();
-        if ($this->_associatedUserId > 0
-            && $response instanceof XenForo_ControllerResponse_Redirect
-        ) {
-            $ssoUrl = Truonglv_YetiShareBridge_Helper_YetiShare::getSSOUrl(
-                $this->_associatedUserId,
-                'login',
-                XenForo_Link::convertUriToAbsoluteUri($response->redirectTarget),
-                $this->_request->getClientIp()
-            );
-            if ($ssoUrl !== null) {
-                return $this->responseRedirect(
-                    XenForo_ControllerResponse_Redirect::RESOURCE_CANONICAL_PERMANENT,
-                    $ssoUrl
-                );
-            }
-        }
+
+        $this->_YetiShare_handleResponse($response, $this->_associatedUserId);
+
+        return $response;
+    }
+
+    public function actionGoogle()
+    {
+        $response = parent::actionGoogle();
+
+        /** @var Truonglv_YetiShareBridge_XenForo_Model_UserExternal $userExternalModel */
+        $userExternalModel = $this->_getUserExternalModel();
+        $this->_YetiShare_handleResponse($response, $userExternalModel->getYetiShareAssociateUserId());
 
         return $response;
     }
@@ -33,24 +41,37 @@ class Truonglv_YetiShareBridge_XenForo_ControllerPublic_Register extends XFCP_Tr
     public function actionGoogleRegister()
     {
         $response = parent::actionGoogleRegister();
-        if ($this->_associatedUserId > 0
-            && $response instanceof XenForo_ControllerResponse_Redirect
+
+        $this->_YetiShare_handleResponse($response, $this->_associatedUserId);
+
+        return $response;
+    }
+
+    /**
+     * @param XenForo_ControllerResponse_Abstract $response
+     * @param int|null $userId
+     * @throws XenForo_Exception
+     */
+    protected function _YetiShare_handleResponse(
+        XenForo_ControllerResponse_Abstract &$response,
+        $userId
+    ) {
+        if ($response instanceof XenForo_ControllerResponse_Redirect
+            && $userId > 0
         ) {
             $ssoUrl = Truonglv_YetiShareBridge_Helper_YetiShare::getSSOUrl(
-                $this->_associatedUserId,
+                $userId,
                 'login',
-                XenForo_Link::convertUriToAbsoluteUri($response->redirectTarget),
+                $response->redirectTarget,
                 $this->_request->getClientIp()
             );
             if ($ssoUrl !== null) {
-                return $this->responseRedirect(
+                $response = $this->responseRedirect(
                     XenForo_ControllerResponse_Redirect::RESOURCE_CANONICAL_PERMANENT,
                     $ssoUrl
                 );
             }
         }
-
-        return $response;
     }
 
     /**

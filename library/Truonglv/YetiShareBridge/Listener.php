@@ -55,4 +55,11 @@ class Truonglv_YetiShareBridge_Listener
             $extend[] = 'Truonglv_YetiShareBridge_XenForo_ControllerPublic_Account';
         }
     }
+
+    public static function load_class_XenForo_Model_UserExternal($class, array &$extend)
+    {
+        if ($class === 'XenForo_Model_UserExternal') {
+            $extend[] = 'Truonglv_YetiShareBridge_XenForo_Model_UserExternal';
+        }
+    }
 }
