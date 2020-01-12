@@ -14,6 +14,13 @@ class Truonglv_YetiShareBridge_XenForo_Model_UserExternal extends XFCP_Truonglv_
         $this->_YetiShare_associateUserId = $userId;
     }
 
+    public function updateExternalAuthAssociationExtra($userId, $provider, array $extra = null)
+    {
+        parent::updateExternalAuthAssociationExtra($userId, $provider, $extra);
+
+        $this->_YetiShare_associateUserId = $userId;
+    }
+
     /**
      * @return null|int
      */
